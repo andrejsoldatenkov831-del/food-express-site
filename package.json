@@ -1,27 +1,14 @@
 {
   "name": "food-express",
   "version": "1.0.0",
-  "description": "",
-  "homepage": "https://github.com/andrejsoldatenkov831-del/food-express-site#readme",
-  "bugs": {
-    "url": "https://github.com/andrejsoldatenkov831-del/food-express-site/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/andrejsoldatenkov831-del/food-express-site.git"
-  },
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
   "dependencies": {
-    "body-parser": "^2.2.2",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "sqlite3": "^5.1.7"
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5"
   }
 }
