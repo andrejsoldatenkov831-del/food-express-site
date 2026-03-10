@@ -12,7 +12,12 @@ const db = new sqlite3.Database('./orders.db');
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customer_name TEXT, phone TEXT, address TEXT, items TEXT, total_price INTEGER, date TEXT
+        customer_name TEXT, 
+        phone TEXT, 
+        address TEXT, 
+        items TEXT, 
+        total_price INTEGER, 
+        date TEXT
     )`);
 });
 
@@ -35,4 +40,4 @@ app.get('/api/admin/orders', (req, res) => {
     });
 });
 
-app.listen(port, () => console.log(`🚀 Server active on port ${port}`));
+app.listen(port, () => console.log(`🚀 Сервер запущено на порту ${port}`));
