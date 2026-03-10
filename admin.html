@@ -2,55 +2,57 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Адмінка</title>
+    <title>Панель адміністратора</title>
     <style>
-        table { width: 100%; border-collapse: collapse; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background: #eee; }
+        body { font-family: sans-serif; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; }
+        tr:nth-child(even) { background: #fafafa; }
     </style>
 </head>
 <body>
-    <h1>Нові замовлення</h1>
+    <h1>Усі замовлення</h1>
+    <button onclick="loadOrders()">Оновити дані</button>
+    
     <table>
         <thead>
             <tr>
+                <th>ID</th>
+                <th>Дата</th>
                 <th>Клієнт</th>
-                <th>Адреса</th>
                 <th>Товари</th>
                 <th>Сума</th>
             </tr>
         </thead>
-        <tbody id="admin-table"></tbody>
+        <tbody id="orders-table"></tbody>
     </table>
 
-<script>
-    async function loadOrders() {
-        try {
-            const res = await fetch('/api/admin/orders');
-            const data = await res.json();
-            const table = document.getElementById('admin-table');
-            table.innerHTML = "";
-
-            data.forEach(order => {
-                let itemsList = "";
-                try {
-                    const parsedItems = JSON.parse(order.items);
-                    itemsList = parsedItems.map(i => i.name).join(", ");
-                } catch(e) { itemsList = order.items; }
-
-                table.innerHTML += `
-                    <tr>
-                        <td>${order.customer_name}<br>${order.phone}</td>
-                        <td>${order.address}</td>
-                        <td>${itemsList}</td>
-                        <td>${order.total_price} грн</td>
-                    </tr>
-                `;
-            });
-        } catch (e) { console.error("Помилка завантаження", e); }
-    }
-    loadOrders();
-    setInterval(loadOrders, 10000); // Оновлення кожні 10 сек
-</script>
+    <script>
+        async function loadOrders() {
+            const tbody = document.getElementById('orders-table');
+            try {
+                const response = await fetch('/api/admin/orders');
+                const orders = await response.json();
+                
+                tbody.innerHTML = '';
+                orders.forEach(order => {
+                    const items = JSON.parse(order.items).map(i => i.name).join(', ');
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${order.id}</td>
+                            <td>${order.date}</td>
+                            <td>${order.customer_name} (${order.phone})<br>${order.address}</td>
+                            <td>${items}</td>
+                            <td>${order.total_price} грн</td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {
+                tbody.innerHTML = '<tr><td colspan="5">Помилка завантаження замовлень. Перевірте, чи працює сервер.</td></tr>';
+            }
+        }
+        loadOrders();
+    </script>
 </body>
 </html>
