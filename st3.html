@@ -2,48 +2,103 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Оформлення</title>
+    <title>Оформлення замовлення</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; color: white;
+        }
+        .order-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            padding: 40px; border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 100%; max-width: 450px;
+            animation: fadeInScale 0.6s ease-out;
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        h2 { text-align: center; margin-bottom: 30px; letter-spacing: 1px; }
+        .input-group { position: relative; margin-bottom: 25px; }
+        input {
+            width: 100%; padding: 12px 0; background: none; border: none;
+            border-bottom: 2px solid #fff; color: white; font-size: 16px; outline: none;
+            transition: 0.3s;
+        }
+        .input-group label {
+            position: absolute; top: 12px; left: 0; pointer-events: none;
+            transition: 0.3s; color: rgba(255,255,255,0.7);
+        }
+        input:focus ~ label, input:valid ~ label {
+            top: -15px; font-size: 12px; color: #ffeb3b;
+        }
+        .item-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        .submit-btn {
+            width: 100%; padding: 15px; border-radius: 30px; border: none;
+            background: #ffeb3b; color: #333; font-weight: bold; font-size: 18px;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255,235,59,0.4);
+        }
+        .submit-btn:hover { transform: translateY(-3px); background: #fff; }
+    </style>
 </head>
-<body style="font-family: sans-serif; padding: 20px;">
-    <h2>Ваше замовлення:</h2>
-    <div id="items-list"></div>
-    <hr>
-    <form id="orderForm">
-        <input type="text" id="name" placeholder="Ім'я" required><br><br>
-        <input type="tel" id="phone" placeholder="Телефон" required><br><br>
-        <input type="text" id="addr" placeholder="Адреса" required><br><br>
-        <button type="submit">Замовити</button>
+<body>
+
+<div class="order-card">
+    <h2>Ваше замовлення</h2>
+    <div id="cart-list"></div>
+    <p style="text-align: right; font-size: 20px;">Разом: <span id="final-sum">0</span> грн</p>
+    <hr style="opacity: 0.3; margin: 20px 0;">
+    
+    <form id="checkoutForm">
+        <div class="input-group">
+            <input type="text" id="user-name" required>
+            <label>Ваше ім'я</label>
+        </div>
+        <div class="input-group">
+            <input type="tel" id="user-phone" required>
+            <label>Номер телефону</label>
+        </div>
+        <div class="input-group">
+            <input type="text" id="user-addr" required>
+            <label>Адреса доставки</label>
+        </div>
+        <button type="submit" class="submit-btn">ПІДТВЕРДИТИ</button>
     </form>
+</div>
 
-    <script>
-        const list = document.getElementById('items-list');
-        let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
-        let total = 0;
+<script>
+    const list = document.getElementById('cart-list');
+    const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+    let total = 0;
 
-        cart.forEach(i => {
-            list.innerHTML += `<p>${i.name} — ${i.price} грн</p>`;
-            total += i.price;
+    cart.forEach(item => {
+        list.innerHTML += `<div class="item-row"><span>${item.name}</span><span>${item.price} грн</span></div>`;
+        total += item.price;
+    });
+    document.getElementById('final-sum').innerText = total;
+
+    document.getElementById('checkoutForm').onsubmit = async (e) => {
+        e.preventDefault();
+        const response = await fetch('/api/order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                name: document.getElementById('user-name').value,
+                phone: document.getElementById('user-phone').value,
+                address: document.getElementById('user-addr').value,
+                items: cart, total: total
+            })
         });
-
-        document.getElementById('orderForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const res = await fetch('/api/order', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    name: document.getElementById('name').value,
-                    phone: document.getElementById('phone').value,
-                    address: document.getElementById('addr').value,
-                    items: cart,
-                    total: total
-                })
-            });
-            if (res.ok) {
-                alert("Замовлення прийнято!");
-                sessionStorage.clear();
-                window.location.href = "/";
-            }
-        };
-    </script>
+        if (response.ok) {
+            alert("Замовлення успішно відправлено!");
+            sessionStorage.clear();
+            window.location.href = "/";
+        }
+    };
+</script>
 </body>
 </html>
