@@ -2,103 +2,96 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Оформлення замовлення</title>
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh; margin: 0; color: white;
-        }
-        .order-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(15px);
-            padding: 40px; border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            width: 100%; max-width: 450px;
-            animation: fadeInScale 0.6s ease-out;
-        }
-        @keyframes fadeInScale {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        h2 { text-align: center; margin-bottom: 30px; letter-spacing: 1px; }
-        .input-group { position: relative; margin-bottom: 25px; }
-        input {
-            width: 100%; padding: 12px 0; background: none; border: none;
-            border-bottom: 2px solid #fff; color: white; font-size: 16px; outline: none;
-            transition: 0.3s;
-        }
-        .input-group label {
-            position: absolute; top: 12px; left: 0; pointer-events: none;
-            transition: 0.3s; color: rgba(255,255,255,0.7);
-        }
-        input:focus ~ label, input:valid ~ label {
-            top: -15px; font-size: 12px; color: #ffeb3b;
-        }
-        .item-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
-        .submit-btn {
-            width: 100%; padding: 15px; border-radius: 30px; border: none;
-            background: #ffeb3b; color: #333; font-weight: bold; font-size: 18px;
-            cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255,235,59,0.4);
-        }
-        .submit-btn:hover { transform: translateY(-3px); background: #fff; }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .order-box { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); padding: 40px; border-radius: 30px; width: 100%; max-width: 400px; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        h2 { text-align: center; margin-bottom: 30px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; color: #ffeb3b; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: none; box-sizing: border-box; }
+        .total { text-align: right; font-size: 20px; font-weight: bold; margin: 20px 0; }
+        .confirm-btn { background: #ffeb3b; color: #333; border: none; width: 100%; padding: 18px; border-radius: 20px; font-weight: bold; font-size: 18px; cursor: pointer; transition: 0.3s; }
+        .confirm-btn:hover { transform: scale(1.02); background: #fdd835; }
     </style>
 </head>
 <body>
 
-<div class="order-card">
+<div class="order-box">
     <h2>Ваше замовлення</h2>
-    <div id="cart-list"></div>
-    <p style="text-align: right; font-size: 20px;">Разом: <span id="final-sum">0</span> грн</p>
-    <hr style="opacity: 0.3; margin: 20px 0;">
-    
-    <form id="checkoutForm">
-        <div class="input-group">
-            <input type="text" id="user-name" required>
-            <label>Ваше ім'я</label>
-        </div>
-        <div class="input-group">
-            <input type="tel" id="user-phone" required>
-            <label>Номер телефону</label>
-        </div>
-        <div class="input-group">
-            <input type="text" id="user-addr" required>
-            <label>Адреса доставки</label>
-        </div>
-        <button type="submit" class="submit-btn">ПІДТВЕРДИТИ</button>
-    </form>
+    <div id="cart-items"></div>
+    <div class="total" id="total-price">Разом: 0 грн</div>
+
+    <div class="input-group">
+        <label>Ваше ім'я</label>
+        <input type="text" id="name" placeholder="Введіть ім'я">
+    </div>
+    <div class="input-group">
+        <label>Номер телефону</label>
+        <input type="text" id="phone" placeholder="+380...">
+    </div>
+    <div class="input-group">
+        <label>Адреса доставки</label>
+        <input type="text" id="address" placeholder="Вулиця, будинок...">
+    </div>
+
+    <button class="confirm-btn" onclick="sendOrder()">ПІДТВЕРДИТИ</button>
 </div>
 
 <script>
-    const list = document.getElementById('cart-list');
     const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
-    let total = 0;
+    const itemsDiv = document.getElementById('cart-items');
+    const totalDiv = document.getElementById('total-price');
+    let totalSum = 0;
 
+    // Відображення товарів у кошику
     cart.forEach(item => {
-        list.innerHTML += `<div class="item-row"><span>${item.name}</span><span>${item.price} грн</span></div>`;
-        total += item.price;
+        itemsDiv.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>${item.name}</span><span>${item.price} грн</span>
+        </div>`;
+        totalSum += item.price;
     });
-    document.getElementById('final-sum').innerText = total;
+    totalDiv.innerText = `Разом: ${totalSum} грн`;
 
-    document.getElementById('checkoutForm').onsubmit = async (e) => {
-        e.preventDefault();
-        const response = await fetch('/api/order', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                name: document.getElementById('user-name').value,
-                phone: document.getElementById('user-phone').value,
-                address: document.getElementById('user-addr').value,
-                items: cart, total: total
-            })
-        });
-        if (response.ok) {
-            alert("Замовлення успішно відправлено!");
-            sessionStorage.clear();
-            window.location.href = "/";
+    async function sendOrder() {
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const address = document.getElementById('address').value;
+
+        if (!name || !phone || !address || cart.length === 0) {
+            alert("Заповніть всі поля та додайте товари!");
+            return;
         }
-    };
+
+        const orderData = {
+            name: name,
+            phone: phone,
+            address: address,
+            items: cart,
+            total: totalSum
+        };
+
+        try {
+            const response = await fetch('/api/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+
+            if (response.ok) {
+                alert("Замовлення прийнято! Дякуємо.");
+                sessionStorage.removeItem('cart'); // Очищуємо кошик
+                window.location.href = '/'; // Повертаємо на головну
+            } else {
+                alert("Помилка на сервері. Спробуйте пізніше.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            alert("Не вдалося відправити замовлення.");
+        }
+    }
 </script>
+
 </body>
 </html>
