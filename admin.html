@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <title>Панель Адміністратора | FoodExpress</title>
+    <style>
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #ff4757; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .status-new { color: #27ae60; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <header style="height: 15vh; clip-path: none;">
+        <h1>Панель керування замовленнями</h1>
+    </header>
+
+    <main style="max-width: 1200px;">
+        <div class="glass-panel" style="padding: 20px; border-radius: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Всі замовлення</h2>
+                <button onclick="loadOrders()" class="nav-btn">Оновити список</button>
+            </div>
+            
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Дата</th>
+                        <th>Клієнт</th>
+                        <th>Телефон</th>
+                        <th>Адреса</th>
+                        <th>Страви</th>
+                        <th>Сума</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        async function loadOrders() {
+            try {
+                const response = await fetch('http://localhost:3000/api/admin/orders');
+                const orders = await response.json();
+                const tbody = document.getElementById('ordersBody');
+                tbody.innerHTML = '';
+
+                orders.forEach(order => {
+                    const items = JSON.parse(order.items).map(i => i.name).join(', ');
+                    
+                    const row = `
+                        <tr>
+                            <td>${order.id}</td>
+                            <td>${order.date}</td>
+                            <td>${order.customer_name}</td>
+                            <td>${order.phone}</td>
+                            <td>${order.address}</td>
+                            <td>${items}</td>
+                            <td style="font-weight:bold">${order.total_price} грн</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Помилка завантаження:', error);
+                alert('Не вдалося завантажити замовлення. Перевірте, чи запущений сервер!');
+            }
+        }
+
+        loadOrders();
+    </script>
+</body>
+</html>

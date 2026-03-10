@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
+    <title>Меню | FoodExpress</title>
+    
+    <script>
+        let cart = JSON.parse(localStorage.getItem('userCart')) || [];
+
+        function addToCart(name, price, event) {
+            cart.push({ name: name, price: price });
+
+            localStorage.setItem('userCart', JSON.stringify(cart));
+
+            const panel = document.getElementById('cart-panel');
+            panel.style.display = 'block';
+            
+            let total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cart-count').innerText = cart.length;
+            document.getElementById('cart-total').innerText = total;
+
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = 'Додано! ✅';
+            btn.style.background = '#27ae60';
+            
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = '#ff4757';
+            }, 1000);
+        }
+    </script>
+</head>
+<body>
+    <header style="height: 30vh;">
+        <img src="https://cdn-icons-png.flaticon.com/512/3448/3448609.png" class="logo">
+        <h1>Оберіть свою страву</h1>
+    </header>
+
+    <nav>
+        <div class="nav-container">
+            <a href="index.html" class="nav-btn">Головна</a>
+            <a href="st2.html" class="nav-btn active">Меню</a>
+            <a href="st3.html" class="nav-btn">Оформити</a>
+        </div>
+    </nav>
+
+    <main class="menu-grid">
+        <div class="menu-card">
+            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400" alt="Піца">
+            <div class="card-info">
+                <h3>Піца "Пепероні"</h3>
+                <p>Гостра та соковита з салямі</p>
+                <p class="price-tag">220 грн</p>
+                <button class="buy-btn" onclick="addToCart('Піца Пепероні', 220, event)">Додати у кошик</button>
+            </div>
+        </div>
+
+        <div class="menu-card">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400" alt="Бургер">
+            <div class="card-info">
+                <h3>Біг-Бургер</h3>
+                <p>Подвійна яловичина та сир Чеддер</p>
+                <p class="price-tag">185 грн</p>
+                <button class="buy-btn" onclick="addToCart('Біг-Бургер', 185, event)">Додати у кошик</button>
+            </div>
+        </div>
+
+        <div class="menu-card">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400" alt="Салат">
+            <div class="card-info">
+                <h3>Салат Грецький</h3>
+                <p>Свіжі овочі та справжня Фета</p>
+                <p class="price-tag">140 грн</p>
+                <button class="buy-btn" onclick="addToCart('Салат Грецький', 140, event)">Додати у кошик</button>
+            </div>
+        </div>
+    </main>
+
+    <div id="cart-panel">
+        🛒 Кошик: <span id="cart-count">0</span> страв | 
+        Сума: <span id="cart-total">0</span> грн
+        <br><br>
+        <a href="st3.html" style="color: #ffa502; font-weight: bold; text-decoration: none;">Оформити замовлення →</a>
+    </div>
+
+    <footer>
+        <p>© 2026 FoodExpress - Сокол Т.</p>
+    </footer>
+</body>
+</html>
