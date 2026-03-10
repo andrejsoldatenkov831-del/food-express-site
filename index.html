@@ -2,127 +2,57 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Food Express — Смачна їжа швідко</title>
+    <title>Food Express | Premium Delivery</title>
     <style>
-        /* Основні стилі та фон */
-        body { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%); color: #333; overflow-x: hidden; }
+        :root { --main-color: #ff4757; --sec-color: #2f3542; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #f1f2f6; }
         
-        /* Гарна навігація */
-        .header { background: rgba(255, 255, 255, 0.95); padding: 15px 50px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(5px); }
-        .logo { font-size: 24px; font-weight: bold; color: #ff6b6b; text-transform: uppercase; letter-spacing: 1px; }
-        .nav-links a { text-decoration: none; color: #555; margin-left: 25px; font-weight: 500; transition: color 0.3s; position: relative; }
-        .nav-links a:hover { color: #ff6b6b; }
-        .nav-links a::after { content: ''; display: block; width: 0; height: 2px; background: #ff6b6b; transition: width 0.3s; position: absolute; bottom: -5px; left: 0; }
-        .nav-links a:hover::after { width: 100%; }
-
-        /* Заголовок та сітка */
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        h1.main-title { text-align: center; color: #444; margin-bottom: 40px; font-size: 36px; text-transform: capitalize; }
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-
-        /* Стиль картки товару з АНІМАЦІЄЮ появи */
-        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease; animation: fadeInUp 0.5s ease backwards; opacity: 0; }
+        .hero { background: var(--sec-color); color: white; padding: 60px 20px; text-align: center; clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%); }
+        .hero h1 { font-size: 3rem; margin: 0; animation: slideDown 0.8s ease; }
         
-        /* Плавна поява карток по черзі */
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
-        .card:nth-child(4) { animation-delay: 0.4s; }
-        .card:nth-child(5) { animation-delay: 0.5s; }
-        .card:nth-child(6) { animation-delay: 0.6s; }
+        .container { max-width: 1200px; margin: -40px auto 40px; padding: 20px; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        
+        .card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: 0.4s; position: relative; opacity: 0; animation: fadeInUp 0.6s forwards; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(255, 71, 87, 0.2); }
+        
+        .card img { width: 100%; height: 220px; object-fit: cover; }
+        .card-content { padding: 20px; text-align: center; }
+        .price { font-size: 1.5rem; color: var(--main-color); font-weight: bold; margin: 10px 0; }
+        
+        .btn-add { background: var(--main-color); color: white; border: none; padding: 12px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; transition: 0.3s; width: 100%; }
+        .btn-add:hover { background: #ff6b81; letter-spacing: 1px; }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Ефект при наведенні на картку */
-        .card:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
-
-        /* Картинка товару */
-        .card-img { width: 100%; height: 200px; object-fit: cover; border-bottom: 2px solid #f0f0f0; }
-
-        /* Текст та ціна */
-        .card-info { padding: 20px; text-align: center; }
-        .card-info h3 { margin: 0 0 10px 0; font-size: 20px; color: #333; }
-        .card-price { color: #28a745; font-size: 22px; font-weight: bold; margin-bottom: 15px; display: block; }
-
-        /* Гарна кнопка з АНІМАЦІЄЮ натискання */
-        .add-btn { background: linear-gradient(45deg, #ff9f43, #ff6b6b); color: white; border: none; padding: 12px 25px; border-radius: 25px; cursor: pointer; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; transition: background 0.3s, transform 0.1s; box-shadow: 0 4px 10px rgba(255,107,107,0.3); outline: none; }
-        .add-btn:hover { background: linear-gradient(45deg, #ff6b6b, #ff9f43); box-shadow: 0 6px 15px rgba(255,107,107,0.4); }
-        .add-btn:active { transform: scale(0.95); box-shadow: 0 2px 5px rgba(255,107,107,0.2); }
-
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes fadeInUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
-
-<div class="header">
-    <div class="logo">Food Express</div>
-    <div class="nav-links">
-        <a href="/">Меню</a>
-        <a href="st3.html">Оформити</a>
-        <a href="admin.html">Адмін</a>
+    <div class="hero">
+        <h1>FOOD EXPRESS</h1>
+        <p>Найшвидша доставка твого міста</p>
     </div>
-</div>
-
-<div class="container">
-    <h1 class="main-title">Наше Смачне Меню</h1>
-    <div class="menu-grid">
-        
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=600&auto=format&fit=crop" alt="Піца Маргарита" class="card-img">
-            <div class="card-info">
-                <h3>Піца Маргарита</h3>
-                <span class="card-price">190 грн</span>
-                <button class="add-btn" onclick="addToCart('Піца Маргарита', 190)">Додати</button>
+    
+    <div class="container">
+        <div class="menu-grid">
+            <div class="card" style="animation-delay: 0.2s">
+                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500" alt="Pizza">
+                <div class="card-content">
+                    <h3>Піца Маргарита</h3>
+                    <div class="price">190 грн</div>
+                    <button class="btn-add" onclick="addToCart('Піца Маргарита', 190)">В КОШИК</button>
+                </div>
             </div>
-        }
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1627626775846-122b778965ae?q=80&w=600&auto=format&fit=crop" alt="Піца Пепероні" class="card-img">
-            <div class="card-info">
-                <h3>Піца Пепероні</h3>
-                <span class="card-price">240 грн</span>
-                <button class="add-btn" onclick="addToCart('Піца Пепероні', 240)">Додати</button>
+            <div class="card" style="animation-delay: 0.4s">
+                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500" alt="Burger">
+                <div class="card-content">
+                    <h3>Чізбургер XL</h3>
+                    <div class="price">145 грн</div>
+                    <button class="btn-add" onclick="addToCart('Чізбургер XL', 145)">В КОШИК</button>
+                </div>
             </div>
-        }
-
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=600&auto=format&fit=crop" alt="Чізбургер XL" class="card-img">
-            <div class="card-info">
-                <h3>Чізбургер XL</h3>
-                <span class="card-price">120 грн</span>
-                <button class="add-btn" onclick="addToCart('Чізбургер XL', 120)">Додати</button>
-            </div>
-        }
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1594179047519-f347310d3322?q=80&w=600&auto=format&fit=crop" alt="Дабл Бургер" class="card-img">
-            <div class="card-info">
-                <h3>Дабл Бургер</h3>
-                <span class="card-price">165 грн</span>
-                <button class="add-btn" onclick="addToCart('Дабл Бургер', 165)">Додати</button>
-            </div>
-        }
-
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1556710808-1649988bc277?q=80&w=600&auto=format&fit=crop" alt="Сік Апельсин" class="card-img">
-            <div class="card-info">
-                <h3>Сік Апельсин 0.5</h3>
-                <span class="card-price">55 грн</span>
-                <button class="add-btn" onclick="addToCart('Сік Апельсин 0.5', 55)">Додати</button>
-            </div>
-        }
-        <div class="card">
-            <img src="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=600&auto=format&fit=crop" alt="Кола 0.5" class="card-img">
-            <div class="card-info">
-                <h3>Кола Класік 0.5</h3>
-                <span class="card-price">45 грн</span>
-                <button class="add-btn" onclick="addToCart('Кола Класік 0.5', 45)">Додати</button>
-            </div>
-        }
+        </div>
     </div>
-</div>
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

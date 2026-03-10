@@ -2,57 +2,41 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Панель адміністратора</title>
+    <title>Admin Panel | Orders</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background: #f4f4f4; }
-        tr:nth-child(even) { background: #fafafa; }
+        body { background: #1e272e; color: white; font-family: sans-serif; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff4757; padding-bottom: 15px; }
+        .order-card { background: #2f3542; margin-top: 20px; padding: 20px; border-radius: 15px; border-left: 5px solid #ff4757; animation: slideIn 0.5s ease; }
+        .order-id { color: #ff4757; font-weight: bold; }
+        .items-box { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin: 10px 0; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
     </style>
 </head>
 <body>
-    <h1>Усі замовлення</h1>
-    <button onclick="loadOrders()">Оновити дані</button>
-    
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Дата</th>
-                <th>Клієнт</th>
-                <th>Товари</th>
-                <th>Сума</th>
-            </tr>
-        </thead>
-        <tbody id="orders-table"></tbody>
-    </table>
+    <div class="header">
+        <h1>КЕРУВАННЯ ЗАМОВЛЕННЯМИ</h1>
+        <button onclick="loadOrders()" style="padding: 10px; cursor: pointer;">ОНОВИТИ</button>
+    </div>
+    <div id="orders-container"></div>
 
     <script>
         async function loadOrders() {
-            const tbody = document.getElementById('orders-table');
-            try {
-                const response = await fetch('/api/admin/orders');
-                const orders = await response.json();
-                
-                tbody.innerHTML = '';
-                orders.forEach(order => {
-                    const items = JSON.parse(order.items).map(i => i.name).join(', ');
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${order.id}</td>
-                            <td>${order.date}</td>
-                            <td>${order.customer_name} (${order.phone})<br>${order.address}</td>
-                            <td>${items}</td>
-                            <td>${order.total_price} грн</td>
-                        </tr>
-                    `;
-                });
-            } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="5">Помилка завантаження замовлень. Перевірте, чи працює сервер.</td></tr>';
-            }
+            const container = document.getElementById('orders-container');
+            const res = await fetch('/api/admin/orders');
+            const data = await res.json();
+            
+            container.innerHTML = data.map(order => `
+                <div class="order-card">
+                    <div class="order-id">ЗАМОВЛЕННЯ #${order.id} | ${order.date}</div>
+                    <p><strong>Клієнт:</strong> ${order.customer_name} (${order.phone})</p>
+                    <p><strong>Адреса:</strong> ${order.address}</p>
+                    <div class="items-box">${JSON.parse(order.items).map(i => i.name).join(', ')}</div>
+                    <p><strong>СУМА:</strong> ${order.total_price} грн</p>
+                </div>
+            `).join('');
         }
         loadOrders();
+        setInterval(loadOrders, 10000);
     </script>
 </body>
 </html>
