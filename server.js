@@ -9,18 +9,16 @@ app.use(express.static(__dirname));
 
 const db = new sqlite3.Database('./orders.db');
 
-// Маршрут для адмінки
-app.get('/admin', (req, res) => {
-    const adminPath = path.join(__dirname, 'admin.html');
-    res.sendFile(adminPath, (err) => {
-        if (err) {
-            console.error("Помилка: Файл admin.html не знайдено!", err);
-            res.status(404).send("Сторінка адміна не знайдена. Перевір назву файлу!");
-        }
-    });
-});
+// Головна сторінка
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
-// Решта API (замовлення та видалення)
+// Сторінка МЕНЮ (тепер /menu буде відкривати st2.html)
+app.get('/menu', (req, res) => res.sendFile(path.join(__dirname, 'st2.html')));
+
+// Сторінка АДМІНА
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
+
+// API для замовлень
 app.get('/api/admin/orders', (req, res) => {
     db.all(`SELECT * FROM orders ORDER BY id DESC`, (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -28,11 +26,4 @@ app.get('/api/admin/orders', (req, res) => {
     });
 });
 
-app.delete('/api/admin/orders/:id', (req, res) => {
-    db.run(`DELETE FROM orders WHERE id = ?`, req.params.id, (err) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json({ success: true });
-    });
-});
-
-app.listen(port, () => console.log(`🚀 Сервер на порту ${port}`));
+app.listen(port, () => console.log(`🚀 Сервер запущено!`));
