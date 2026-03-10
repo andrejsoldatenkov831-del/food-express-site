@@ -2,96 +2,55 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Панель адміністратора - Food Express</title>
+    <title>Адмінка</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 30px; }
-        .admin-container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #f8f9fa; color: #555; }
-        tr:hover { background-color: #f1f1f1; }
-        .items-list { font-size: 0.9em; color: #666; }
-        .status-badge { padding: 5px 10px; border-radius: 15px; background: #e1f5fe; color: #01579b; font-size: 0.8em; }
-        .refresh-btn { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; float: right; }
-        .refresh-btn:hover { background: #0056b3; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+        th { background: #eee; }
     </style>
 </head>
 <body>
-
-<div class="admin-container">
-    <button class="refresh-btn" onclick="fetchOrders()">Оновити список</button>
-    <h1>Керування замовленнями</h1>
-    
+    <h1>Нові замовлення</h1>
     <table>
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Дата</th>
-                <th>Клієнт / Телефон</th>
+                <th>Клієнт</th>
                 <th>Адреса</th>
                 <th>Товари</th>
                 <th>Сума</th>
             </tr>
         </thead>
-        <tbody id="orders-table-body">
-            </tbody>
+        <tbody id="admin-table"></tbody>
     </table>
-</div>
 
 <script>
-    async function fetchOrders() {
-        const tbody = document.getElementById('orders-table-body');
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Завантаження...</td></tr>';
-
+    async function loadOrders() {
         try {
-            // Звертаємося до твого сервера на Render
-            const response = await fetch('/api/admin/orders');
-            const orders = await response.json();
+            const res = await fetch('/api/admin/orders');
+            const data = await res.json();
+            const table = document.getElementById('admin-table');
+            table.innerHTML = "";
 
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Замовлень поки немає</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = ''; // Очищуємо таблицю
-
-            orders.forEach(order => {
-                // Парсимо товари (вони збережені як JSON-рядок)
-                let itemsHtml = '';
+            data.forEach(order => {
+                let itemsList = "";
                 try {
-                    const items = JSON.parse(order.items);
-                    itemsHtml = items.map(i => `${i.name}`).join(', ');
-                } catch (e) {
-                    itemsHtml = order.items;
-                }
+                    const parsedItems = JSON.parse(order.items);
+                    itemsList = parsedItems.map(i => i.name).join(", ");
+                } catch(e) { itemsList = order.items; }
 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>#${order.id}</td>
-                    <td>${order.date}</td>
-                    <td>
-                        <strong>${order.customer_name}</strong><br>
-                        <small>${order.phone}</small>
-                    </td>
-                    <td>${order.address}</td>
-                    <td class="items-list">${itemsHtml}</td>
-                    <td><strong>${order.total_price} грн</strong></td>
+                table.innerHTML += `
+                    <tr>
+                        <td>${order.customer_name}<br>${order.phone}</td>
+                        <td>${order.address}</td>
+                        <td>${itemsList}</td>
+                        <td>${order.total_price} грн</td>
+                    </tr>
                 `;
-                tbody.appendChild(row);
             });
-        } catch (error) {
-            console.error('Помилка:', error);
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">Не вдалося завантажити дані</td></tr>';
-        }
+        } catch (e) { console.error("Помилка завантаження", e); }
     }
-
-    // Завантажуємо при відкритті сторінки
-    fetchOrders();
-
-    // Оновлюємо кожні 30 секунд автоматично
-    setInterval(fetchOrders, 30000);
+    loadOrders();
+    setInterval(loadOrders, 10000); // Оновлення кожні 10 сек
 </script>
-
 </body>
 </html>

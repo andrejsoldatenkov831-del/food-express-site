@@ -4,73 +4,77 @@
     <meta charset="UTF-8">
     <title>Оформлення замовлення</title>
     <style>
-        body { font-family: Arial; padding: 20px; }
-        .order-container { max-width: 500px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
-        .item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        body { font-family: sans-serif; padding: 20px; background: #fafafa; }
+        .box { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
         form { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        input { padding: 8px; }
-        button { padding: 10px; background: green; color: white; border: none; cursor: pointer; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div class="order-container">
+<div class="box">
     <h2>Ваше замовлення</h2>
-    <div id="cart-items"></div>
-    <p><strong>Разом: <span id="total-price">0</span> грн</strong></p>
+    <div id="cart-content"></div>
+    <p><strong>Разом: <span id="total">0</span> грн</strong></p>
 
-    <form id="checkout-form">
-        <input type="text" id="cust-name" placeholder="Ваше ім'я" required>
-        <input type="tel" id="cust-phone" placeholder="Телефон" required>
-        <input type="text" id="cust-addr" placeholder="Адреса доставки" required>
+    <form id="order-form">
+        <input type="text" id="name" placeholder="Ім'я" required>
+        <input type="tel" id="phone" placeholder="Телефон" required>
+        <input type="text" id="address" placeholder="Адреса" required>
         <button type="submit">Підтвердити замовлення</button>
     </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const cartItemsContainer = document.getElementById('cart-items');
-    const totalPriceElement = document.getElementById('total-price');
+    const container = document.getElementById('cart-content');
+    const totalDisp = document.getElementById('total');
     
-    // Читаємо дані з того самого ключа 'cart'
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let total = 0;
+    // Отримуємо дані саме з sessionStorage
+    let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+    let sum = 0;
 
     if (cart.length === 0) {
-        cartItemsContainer.innerHTML = "<p>Кошик порожній</p>";
+        container.innerHTML = "<p style='color:red;'>Кошик порожній!</p>";
     } else {
         cart.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'item';
-            div.innerHTML = `<span>${item.name}</span><span>${item.price} грн</span>`;
-            cartItemsContainer.appendChild(div);
-            total += item.price;
+            const el = document.createElement('div');
+            el.className = 'item';
+            el.innerHTML = `<span>${item.name}</span><span>${item.price} грн</span>`;
+            container.appendChild(el);
+            sum += item.price;
         });
     }
-    totalPriceElement.innerText = total;
+    totalDisp.innerText = sum;
 
-    // Відправка на сервер
-    document.getElementById('checkout-form').addEventListener('submit', async (e) => {
+    document.getElementById('order-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        const data = {
-            name: document.getElementById('cust-name').value,
-            phone: document.getElementById('cust-phone').value,
-            address: document.getElementById('cust-addr').value,
+        if (cart.length === 0) return alert("Додайте товари!");
+
+        const order = {
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
             items: cart,
-            total: total
+            total: sum
         };
 
-        const response = await fetch('/api/order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+        try {
+            const res = await fetch('/api/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(order)
+            });
 
-        if (response.ok) {
-            alert("Замовлення успішне!");
-            localStorage.removeItem('cart'); // Очищаємо після успіху
-            window.location.href = "/";
+            if (res.ok) {
+                alert("Замовлення надіслано!");
+                sessionStorage.removeItem('cart'); // Очищаємо після замовлення
+                window.location.href = "/";
+            }
+        } catch (err) {
+            alert("Помилка зв'язку з сервером");
         }
     });
 });
