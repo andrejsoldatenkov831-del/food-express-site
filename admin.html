@@ -2,41 +2,73 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Panel | Orders</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель адміністратора | FoodExpress</title>
     <style>
-        body { background: #1e272e; color: white; font-family: sans-serif; padding: 30px; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff4757; padding-bottom: 15px; }
-        .order-card { background: #2f3542; margin-top: 20px; padding: 20px; border-radius: 15px; border-left: 5px solid #ff4757; animation: slideIn 0.5s ease; }
-        .order-id { color: #ff4757; font-weight: bold; }
-        .items-box { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin: 10px 0; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>КЕРУВАННЯ ЗАМОВЛЕННЯМИ</h1>
-        <button onclick="loadOrders()" style="padding: 10px; cursor: pointer;">ОНОВИТИ</button>
-    </div>
-    <div id="orders-container"></div>
-
-    <script>
-        async function loadOrders() {
-            const container = document.getElementById('orders-container');
-            const res = await fetch('/api/admin/orders');
-            const data = await res.json();
-            
-            container.innerHTML = data.map(order => `
-                <div class="order-card">
-                    <div class="order-id">ЗАМОВЛЕННЯ #${order.id} | ${order.date}</div>
-                    <p><strong>Клієнт:</strong> ${order.customer_name} (${order.phone})</p>
-                    <p><strong>Адреса:</strong> ${order.address}</p>
-                    <div class="items-box">${JSON.parse(order.items).map(i => i.name).join(', ')}</div>
-                    <p><strong>СУМА:</strong> ${order.total_price} грн</p>
-                </div>
-            `).join('');
+        :root {
+            --admin-bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --accent: #ff5c5c;
+            --text: #2d3436;
         }
-        loadOrders();
-        setInterval(loadOrders, 10000);
-    </script>
-</body>
-</html>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--admin-bg); 
+            margin: 0; 
+            padding: 20px; 
+            color: var(--text);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        h1 { font-size: 24px; font-weight: 800; margin: 0; }
+        .refresh-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .refresh-btn:hover { opacity: 0.8; transform: translateY(-2px); }
+
+        .orders-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            gap: 20px;
+        }
+        .order-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-left: 6px solid var(--accent);
+            animation: slideUp 0.5s ease forwards;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .order-id { font-weight: 800; color: var(--accent); }
+        .order-date { font-size: 14px; color: #888; }
+        
+        .client-info p { margin: 5px 0; font-size: 15px; }
+        .client-info strong { color: #555; }
+        
+        .items-list {
+            background: #fffafa;
+            padding: 15px;
