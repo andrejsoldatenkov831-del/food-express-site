@@ -1,52 +1,43 @@
-const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const path = require('path');
+// 1. Функція додавання товару в кошик
+window.addToCart = function(name, price) {
+    // Отримуємо поточний кошик з пам'яті або створюємо порожній масив, якщо його ще немає
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, '/')));
-
-const db = new sqlite3.Database('./orders.db');
-
-db.run(`CREATE TABLE IF NOT EXISTS orders (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    customer_name TEXT,
-    phone TEXT,
-    address TEXT,
-    items TEXT,
-    total_price INTEGER,
-    date TEXT
-)`);
-
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-app.post('/api/order', (req, res) => {
-    const { name, phone, address, items, total } = req.body;
-    const date = new Date().toLocaleString();
-    
-    db.run(`INSERT INTO orders (customer_name, phone, address, items, total_price, date) VALUES (?, ?, ?, ?, ?, ?)`,
-        [name, phone, address, JSON.stringify(items), total, date],
-        function(err) {
-            if (err) return res.status(400).json({ error: err.message });
-            res.json({ message: 'Замовлення отримано!', id: this.lastID });
-        }
-    );
-});
-
-app.get('/api/admin/orders', (req, res) => {
-    db.all(`SELECT * FROM orders ORDER BY id DESC`, [], (err, rows) => {
-        if (err) return res.status(400).json({ error: err.message });
-        res.json(rows);
+    // Додаємо новий об'єкт товару
+    cart.push({
+        name: name,
+        price: Number(price) // Перетворюємо на число, щоб потім легко рахувати суму
     });
-});
 
-app.listen(port, () => {
-    console.log(`Сервер працює на порту ${port}`);
+    // Зберігаємо оновлений масив назад у LocalStorage
+    localStorage.setItem('cart', JSON.stringify(cart));
+
+    // Візуальне підтвердження
+    console.log("Товар додано в кошик:", name, cart);
+    alert(`${name} додано до кошика!`);
+
+    // Оновлюємо лічильник на іконці кошика (якщо вона є)
+    updateCartCount();
+};
+
+// 2. Функція для оновлення кількості товарів (цифра біля іконки кошика)
+function updateCartCount() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const countElement = document.getElementById('cart-count');
+    
+    if (countElement) {
+        countElement.innerText = cart.length;
+    }
+}
+
+// 3. Функція для очищення кошика (якщо знадобиться)
+window.clearCart = function() {
+    localStorage.removeItem('cart');
+    updateCartCount();
+    console.log("Кошик очищено");
+};
+
+// 4. Запускаємо перевірку лічильника відразу при завантаженні будь-якої сторінки
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartCount();
 });
