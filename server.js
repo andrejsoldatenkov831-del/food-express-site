@@ -56,3 +56,23 @@ app.get('/api/admin/orders', (req, res) => {
 app.listen(port, () => {
     console.log(`Сервер працює на порту ${port}`);
 });
+
+// Функція додавання (переконайся, що назва збігається з onclick="addToCart")
+window.addToCart = function(name, price) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    cart.push({ name, price });
+    localStorage.setItem('cart', JSON.stringify(cart));
+    alert(name + " додано до кошика!");
+    updateCartCount();
+};
+
+function updateCartCount() {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const countElement = document.getElementById('cart-count');
+    if (countElement) {
+        countElement.innerText = cart.length;
+    }
+}
+
+// Оновлюємо лічильник при завантаженні
+document.addEventListener('DOMContentLoaded', updateCartCount);
