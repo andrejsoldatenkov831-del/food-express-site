@@ -57,7 +57,6 @@ app.listen(port, () => {
     console.log(`Сервер працює на порту ${port}`);
 });
 
-// Функція додавання (переконайся, що назва збігається з onclick="addToCart")
 window.addToCart = function(name, price) {
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     cart.push({ name, price });
@@ -74,5 +73,4 @@ function updateCartCount() {
     }
 }
 
-// Оновлюємо лічильник при завантаженні
 document.addEventListener('DOMContentLoaded', updateCartCount);
