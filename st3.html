@@ -1,113 +1,102 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css">
-    <title>Оформлення | FoodExpress</title>
+    <meta charset="UTF-8">
+    <title>Оформлення замовлення - Food Express</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .order-item { display: flex; justify-content: space-between; border-bottom: 1px solid #eee; padding: 10px 0; }
+        .total { font-size: 20px; font-weight: bold; margin-top: 20px; text-align: right; }
+        form { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        button { padding: 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #218838; }
+        #empty-msg { text-align: center; color: #888; }
+    </style>
 </head>
 <body>
-    <header style="height: 20vh; clip-path: none;">
-        <h1>Ваше замовлення</h1>
-    </header>
 
-    <nav>
-        <div class="nav-container">
-            <a href="index.html" class="nav-btn">Головна</a>
-            <a href="st2.html" class="nav-btn">Меню</a>
-            <a href="st3.html" class="nav-btn active">Оформити</a>
-        </div>
-    </nav>
+<div class="container">
+    <h2>Ваше замовлення</h2>
+    
+    <div id="order-items-list">
+        <p id="empty-msg">Завантаження кошика...</p>
+    </div>
 
-    <main class="fade-in" style="max-width: 600px;">
-        <div id="success-animation" style="display:none; text-align: center; padding: 50px;">
-            <div class="checkmark-circle">
-                <div class="background"></div>
-                <div class="checkmark draw"></div>
-            </div>
-            <h2 style="color: #27ae60; margin-top: 20px;">Дякуємо за замовлення!</h2>
-            <p>Наш кур'єр вже поспішає до вас...</p>
-            <br>
-            <a href="index.html" class="nav-btn">На головну</a>
-        </div>
+    <div class="total">Разом: <span id="total-price">0</span> грн</div>
 
-        <div id="order-content">
-            <div id="order-summary" class="glass-panel" style="margin-bottom: 20px; padding: 20px; border-radius: 15px;">
-                <h3>🛒 Ваші страви:</h3>
-                <ul id="items-list" style="list-style: none; margin: 15px 0;"></ul>
-                <hr style="border: 0; border-top: 1px solid #eee;">
-                <p style="font-size: 1.2rem; font-weight: bold; margin-top: 10px;">
-                    До сплати: <span id="final-price">0</span> грн
-                </p>
-            </div>
+    <form id="order-form">
+        <h3>Дані для доставки</h3>
+        <input type="text" id="name" placeholder="Ваше ім'я" required>
+        <input type="tel" id="phone" placeholder="Номер телефону" required>
+        <input type="text" id="address" placeholder="Адреса доставки" required>
+        <button type="submit">Підтвердити замовлення</button>
+    </form>
+</div>
 
-            <form id="orderForm">
-                <fieldset style="border: none;">
-                    <legend style="margin-bottom: 10px; font-weight: bold;">Контактні дані</legend>
-                    <input type="text" placeholder="Прізвище та Ім'я" required class="input-field">
-                    <input type="tel" placeholder="Номер телефону" required class="input-field">
-                    <input type="text" placeholder="Адреса доставки" required class="input-field">
-                    
-                    <div class="btn-group" style="margin-top: 20px;">
-                        <input type="submit" value="Підтвердити замовлення" class="buy-btn" style="font-size: 1.1rem; height: 50px;">
-                    </div>
-                </fieldset>
-            </form>
-        </div>
-    </main>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const listElement = document.getElementById('order-items-list');
+    const totalElement = document.getElementById('total-price');
+    const orderForm = document.getElementById('order-form');
 
-    <script>
-        const cartData = JSON.parse(localStorage.getItem('userCart')) || [];
-        const listElement = document.getElementById('items-list');
-        const finalPriceElement = document.getElementById('final-price');
+    // 1. Отримуємо товари з localStorage
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-        if (cartData.length === 0) {
-            listElement.innerHTML = "<li>Кошик порожній :(</li>";
-        } else {
-            let total = 0;
-            cartData.forEach(item => {
-                const li = document.createElement('li');
-                li.style.display = "flex";
-                li.style.justifyContent = "space-between";
-                li.style.padding = "5px 0";
-                li.innerHTML = `<span>${item.name}</span> <b>${item.price} грн</b>`;
-                listElement.appendChild(li);
-                total += item.price;
-            });
-            finalPriceElement.innerText = total;
-        }
-
-        document.getElementById('orderForm').onsubmit = async function(e) {
-    e.preventDefault();
-
-    const orderData = {
-        name: document.querySelector('input[placeholder="Прізвище та Ім\'я"]').value,
-        phone: document.querySelector('input[placeholder="Номер телефону"]').value,
-        address: document.querySelector('input[placeholder="Адреса доставки"]').value,
-        items: JSON.parse(localStorage.getItem('userCart')) || [],
-        total: document.getElementById('final-price').innerText
-    };
-
-    try {
-        const response = await fetch('/api/order'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData)
-        });
-
-        if (response.ok) {
-            document.getElementById('order-content').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('order-content').style.display = 'none';
-                document.getElementById('success-animation').style.display = 'block';
-                localStorage.removeItem('userCart');
-            }, 500);
-        }
-    } catch (error) {
-        alert("Помилка з'єднання з сервером бази даних!");
-        console.error(error);
+    if (cart.length === 0) {
+        listElement.innerHTML = '<p id="empty-msg">Кошик порожній. Поверніться в меню.</p>';
+        return;
     }
-};
-    </script>
+
+    // 2. Виводимо список товарів
+    listElement.innerHTML = '';
+    let total = 0;
+
+    cart.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'order-item';
+        div.innerHTML = `<span>${item.name}</span> <span>${item.price} грн</span>`;
+        listElement.appendChild(div);
+        total += Number(item.price);
+    });
+
+    totalElement.innerText = total;
+
+    // 3. Відправка замовлення на сервер
+    orderForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const orderData = {
+            name: document.getElementById('name').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('address').value,
+            items: cart,
+            total: total
+        };
+
+        try {
+            // ВАЖЛИВО: Використовуй відносний шлях, щоб працювало і на Render, і локально
+            const response = await fetch('/api/order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+
+            if (response.ok) {
+                alert('Дякуємо! Замовлення прийнято.');
+                localStorage.removeItem('cart'); // Очищуємо кошик після успіху
+                window.location.href = '/'; // Повертаємо на головну
+            } else {
+                alert('Помилка сервера. Спробуйте пізніше.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Не вдалося з’єднатися з сервером.');
+        }
+    });
+});
+</script>
+
 </body>
 </html>
