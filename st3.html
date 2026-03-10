@@ -3,83 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Оформлення</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .box { max-width: 450px; margin: auto; border: 1px solid #ccc; padding: 15px; border-radius: 8px; }
-        .item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
-        form { margin-top: 15px; display: flex; flex-direction: column; gap: 8px; }
-        input { padding: 8px; }
-        button { padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
-    </style>
 </head>
-<body>
-    <div class="box">
-        <h3>Ваші товари:</h3>
-        <div id="display-items"></div>
-        <p><strong>Сума: <span id="sum">0</span> грн</strong></p>
+<body style="font-family: sans-serif; padding: 20px;">
+    <h2>Ваше замовлення:</h2>
+    <div id="items-list"></div>
+    <hr>
+    <form id="orderForm">
+        <input type="text" id="name" placeholder="Ім'я" required><br><br>
+        <input type="tel" id="phone" placeholder="Телефон" required><br><br>
+        <input type="text" id="addr" placeholder="Адреса" required><br><br>
+        <button type="submit">Замовити</button>
+    </form>
 
-        <form id="final-form">
-            <input type="text" id="u-name" placeholder="Ім'я" required>
-            <input type="tel" id="u-phone" placeholder="Телефон" required>
-            <input type="text" id="u-addr" placeholder="Адреса" required>
-            <button type="submit">Замовити</button>
-        </form>
-    </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const list = document.getElementById('display-items');
-    const totalField = document.getElementById('sum');
-    
-    // Читаємо дані
-    const data = sessionStorage.getItem('cart');
-    console.log("Сирі дані з пам'яті:", data); // ПЕРЕВІРКА В КОНСОЛІ (F12)
-
-    let cart = [];
-    if (data) {
-        cart = JSON.parse(data);
-    }
-
-    if (cart.length === 0) {
-        list.innerHTML = "<p style='color:red;'>Кошик порожній! Поверніться і додайте товар.</p>";
-    } else {
+    <script>
+        const list = document.getElementById('items-list');
+        let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
         let total = 0;
-        list.innerHTML = "";
-        cart.forEach(item => {
-            const row = document.createElement('div');
-            row.className = 'item';
-            row.innerHTML = `<span>${item.name}</span><span>${item.price} грн</span>`;
-            list.appendChild(row);
-            total += item.price;
+
+        cart.forEach(i => {
+            list.innerHTML += `<p>${i.name} — ${i.price} грн</p>`;
+            total += i.price;
         });
-        totalField.innerText = total;
-    }
 
-    document.getElementById('final-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (cart.length === 0) return alert("Кошик порожній!");
-
-        const order = {
-            name: document.getElementById('u-name').value,
-            phone: document.getElementById('u-phone').value,
-            address: document.getElementById('u-addr').value,
-            items: cart,
-            total: Number(totalField.innerText)
+        document.getElementById('orderForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const res = await fetch('/api/order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    name: document.getElementById('name').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('addr').value,
+                    items: cart,
+                    total: total
+                })
+            });
+            if (res.ok) {
+                alert("Замовлення прийнято!");
+                sessionStorage.clear();
+                window.location.href = "/";
+            }
         };
-
-        const res = await fetch('/api/order', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(order)
-        });
-
-        if (res.ok) {
-            alert("Замовлення прийнято!");
-            sessionStorage.removeItem('cart');
-            window.location.href = "/";
-        }
-    });
-});
-</script>
+    </script>
 </body>
 </html>

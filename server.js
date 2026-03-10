@@ -9,7 +9,6 @@ app.use(express.static(__dirname));
 
 const db = new sqlite3.Database('./orders.db');
 
-// Створюємо таблицю, якщо її немає
 db.run(`CREATE TABLE IF NOT EXISTS orders (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     customer_name TEXT,
@@ -20,15 +19,6 @@ db.run(`CREATE TABLE IF NOT EXISTS orders (
     date TEXT
 )`);
 
-// Отримання замовлень для адмінки
-app.get('/api/admin/orders', (req, res) => {
-    db.all(`SELECT * FROM orders ORDER BY id DESC`, [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
-});
-
-// Прийом нового замовлення
 app.post('/api/order', (req, res) => {
     const { name, phone, address, items, total } = req.body;
     const date = new Date().toLocaleString();
@@ -36,9 +26,16 @@ app.post('/api/order', (req, res) => {
         [name, phone, address, JSON.stringify(items), total, date],
         function(err) {
             if (err) return res.status(500).json({ error: err.message });
-            res.json({ id: this.lastID });
+            res.json({ success: true, id: this.lastID });
         }
     );
 });
 
-app.listen(port, () => console.log(`Server is running on port ${port}`));
+app.get('/api/admin/orders', (req, res) => {
+    db.all(`SELECT * FROM orders ORDER BY id DESC`, (err, rows) => {
+        if (err) return res.status(500).json({ error: err.message });
+        res.json(rows);
+    });
+});
+
+app.listen(port, () => console.log(`Сервер готовий на порту ${port}`));

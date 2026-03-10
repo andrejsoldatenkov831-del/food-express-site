@@ -1,38 +1,61 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="style.css">
-    <title>FoodExpress | Головна</title>
+    <meta charset="UTF-8">
+    <title>Food Express — Меню</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; background: #f8f9fa; }
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .card h3 { margin: 10px 0; }
+        .card p { color: #28a745; font-weight: bold; }
+        button { background: #ffc107; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #e0a800; }
+        .nav { margin-bottom: 30px; text-align: center; }
+        .nav a { margin: 0 15px; text-decoration: none; color: #333; font-weight: bold; }
+    </style>
 </head>
 <body>
-    <header style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=1000&auto=format&fit=crop');">
-        <div class="header-content">
-            <img src="https://cdn-icons-png.flaticon.com/512/3448/3448609.png" alt="Logo" class="logo">
-            <h1 class="animate-pop">Смачна їжа онлайн</h1>
-        </div>
-    </header>
 
-    <nav>
-        <div class="nav-container">
-            <a href="index.html" class="nav-btn active">Головна</a>
-            <a href="st2.html" class="nav-btn">Меню</a>
-            <a href="st3.html" class="nav-btn">Замовлення</a>
-        </div>
-    </nav>
+<div class="nav">
+    <a href="/">Меню</a>
+    <a href="st3.html">Кошик</a>
+    <a href="admin.html">Адмін</a>
+</div>
 
-    <main class="fade-in">
-        <section class="hero-text">
-            <h2>Доставка за 30 хвилин або безкоштовно!</h2>
-            <p>Ми використовуємо тільки італійське борошно та найсвіжіші томати.</p>
-            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=800&auto=format&fit=crop" class="main-img" alt="Стіл з їжею">
-        </section>
-    </main>
+<div class="menu-grid">
+    <div class="card">
+        <h3>Піца Маргарита</h3>
+        <p>190 грн</p>
+        <button onclick="addToCart('Піца Маргарита', 190)">Додати</button>
+    </div>
+    <div class="card">
+        <h3>Піца Пепероні</h3>
+        <p>240 грн</p>
+        <button onclick="addToCart('Піца Пепероні', 240)">Додати</button>
+    </div>
+    <div class="card">
+        <h3>Чізбургер XL</h3>
+        <p>120 грн</p>
+        <button onclick="addToCart('Чізбургер XL', 120)">Додати</button>
+    </div>
+    <div class="card">
+        <h3>Дабл Бургер</h3>
+        <p>165 грн</p>
+        <button onclick="addToCart('Дабл Бургер', 165)">Додати</button>
+    </div>
+    <div class="card">
+        <h3>Кола 0.5</h3>
+        <p>45 грн</p>
+        <button onclick="addToCart('Кола 0.5', 45)">Додати</button>
+    </div>
+    <div class="card">
+        <h3>Сік Апельсин</h3>
+        <p>55 грн</p>
+        <button onclick="addToCart('Сік Апельсин', 55)">Додати</button>
+    </div>
+</div>
 
-    <footer>
-        <p><strong>Розробник:</strong> Сокол Т.</p>
-        <p><strong>Email:</strong> kgkl49@krkl49.ukr.education</p>
-    </footer>
+<script src="script.js"></script>
 </body>
 </html>
