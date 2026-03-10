@@ -5,20 +5,18 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
-app.use(express.static(__dirname)); 
+app.use(express.static(__dirname));
 
 const db = new sqlite3.Database('./orders.db');
 
-db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        customer_name TEXT, phone TEXT, address TEXT, items TEXT, total_price INTEGER, date TEXT
-    )`);
-});
+db.run(`CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_name TEXT, phone TEXT, address TEXT, items TEXT, total_price INTEGER, date TEXT
+)`);
 
 app.post('/api/order', (req, res) => {
     const { name, phone, address, items, total } = req.body;
-    const date = new Date().toLocaleString('uk-UA');
+    const date = new Date().toLocaleString();
     db.run(`INSERT INTO orders (customer_name, phone, address, items, total_price, date) VALUES (?, ?, ?, ?, ?, ?)`,
         [name, phone, address, JSON.stringify(items), total, date],
         function(err) {
@@ -35,4 +33,4 @@ app.get('/api/admin/orders', (req, res) => {
     });
 });
 
-app.listen(port, () => console.log(`🚀 Сервер на порту ${port}`));
+app.listen(port, () => console.log(`Server live on port ${port}`));
