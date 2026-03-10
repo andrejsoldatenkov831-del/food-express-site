@@ -1,74 +1,19 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html>
 <head>
+    <title>Панель</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель адміністратора | FoodExpress</title>
-    <style>
-        :root {
-            --admin-bg: #f4f7f6;
-            --card-bg: #ffffff;
-            --accent: #ff5c5c;
-            --text: #2d3436;
+</head>
+<body style="background: #f4f4f4; padding: 20px;">
+    <h1>Адмін-панель</h1>
+    <div id="orders-list">Завантаження замовлень...</div>
+    <script>
+        async function load() {
+            const res = await fetch('/api/admin/orders');
+            const data = await res.json();
+            document.getElementById('orders-list').innerHTML = JSON.stringify(data);
         }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--admin-bg); 
-            margin: 0; 
-            padding: 20px; 
-            color: var(--text);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 800px;
-            margin: 0 auto 30px;
-        }
-        h1 { font-size: 24px; font-weight: 800; margin: 0; }
-        .refresh-btn {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .refresh-btn:hover { opacity: 0.8; transform: translateY(-2px); }
-
-        .orders-container {
-            max-width: 800px;
-            margin: 0 auto;
-            display: grid;
-            gap: 20px;
-        }
-        .order-card {
-            background: var(--card-bg);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            border-left: 6px solid var(--accent);
-            animation: slideUp 0.5s ease forwards;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-        .order-id { font-weight: 800; color: var(--accent); }
-        .order-date { font-size: 14px; color: #888; }
-        
-        .client-info p { margin: 5px 0; font-size: 15px; }
-        .client-info strong { color: #555; }
-        
-        .items-list {
-            background: #fffafa;
-            padding: 15px;
+        load();
+    </script>
+</body>
+</html>
