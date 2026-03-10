@@ -7,13 +7,10 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Налаштування
 app.use(cors());
 app.use(bodyParser.json());
-// Цей рядок дозволяє серверу показувати твої HTML, CSS та картинки
 app.use(express.static(path.join(__dirname, '/')));
 
-// База даних
 const db = new sqlite3.Database('./orders.db');
 
 db.run(`CREATE TABLE IF NOT EXISTS orders (
@@ -26,12 +23,10 @@ db.run(`CREATE TABLE IF NOT EXISTS orders (
     date TEXT
 )`);
 
-// Головна сторінка (виправляє "Cannot GET /")
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Шлях для нових замовлень
 app.post('/api/order', (req, res) => {
     const { name, phone, address, items, total } = req.body;
     const date = new Date().toLocaleString();
@@ -45,7 +40,6 @@ app.post('/api/order', (req, res) => {
     );
 });
 
-// Шлях для адмінки
 app.get('/api/admin/orders', (req, res) => {
     db.all(`SELECT * FROM orders ORDER BY id DESC`, [], (err, rows) => {
         if (err) return res.status(400).json({ error: err.message });
@@ -56,21 +50,3 @@ app.get('/api/admin/orders', (req, res) => {
 app.listen(port, () => {
     console.log(`Сервер працює на порту ${port}`);
 });
-
-window.addToCart = function(name, price) {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    cart.push({ name, price });
-    localStorage.setItem('cart', JSON.stringify(cart));
-    alert(name + " додано до кошика!");
-    updateCartCount();
-};
-
-function updateCartCount() {
-    let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const countElement = document.getElementById('cart-count');
-    if (countElement) {
-        countElement.innerText = cart.length;
-    }
-}
-
-document.addEventListener('DOMContentLoaded', updateCartCount);
