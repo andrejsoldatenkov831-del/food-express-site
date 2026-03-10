@@ -2,79 +2,81 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Оформлення замовлення</title>
+    <title>Оформлення</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #fafafa; }
-        .box { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-        form { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        button { padding: 12px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        body { font-family: sans-serif; padding: 20px; }
+        .box { max-width: 450px; margin: auto; border: 1px solid #ccc; padding: 15px; border-radius: 8px; }
+        .item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; }
+        form { margin-top: 15px; display: flex; flex-direction: column; gap: 8px; }
+        input { padding: 8px; }
+        button { padding: 10px; background: #28a745; color: white; border: none; cursor: pointer; }
     </style>
 </head>
 <body>
+    <div class="box">
+        <h3>Ваші товари:</h3>
+        <div id="display-items"></div>
+        <p><strong>Сума: <span id="sum">0</span> грн</strong></p>
 
-<div class="box">
-    <h2>Ваше замовлення</h2>
-    <div id="cart-content"></div>
-    <p><strong>Разом: <span id="total">0</span> грн</strong></p>
-
-    <form id="order-form">
-        <input type="text" id="name" placeholder="Ім'я" required>
-        <input type="tel" id="phone" placeholder="Телефон" required>
-        <input type="text" id="address" placeholder="Адреса" required>
-        <button type="submit">Підтвердити замовлення</button>
-    </form>
-</div>
+        <form id="final-form">
+            <input type="text" id="u-name" placeholder="Ім'я" required>
+            <input type="tel" id="u-phone" placeholder="Телефон" required>
+            <input type="text" id="u-addr" placeholder="Адреса" required>
+            <button type="submit">Замовити</button>
+        </form>
+    </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('cart-content');
-    const totalDisp = document.getElementById('total');
+    const list = document.getElementById('display-items');
+    const totalField = document.getElementById('sum');
     
-    // Отримуємо дані саме з sessionStorage
-    let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
-    let sum = 0;
+    // Читаємо дані
+    const data = sessionStorage.getItem('cart');
+    console.log("Сирі дані з пам'яті:", data); // ПЕРЕВІРКА В КОНСОЛІ (F12)
+
+    let cart = [];
+    if (data) {
+        cart = JSON.parse(data);
+    }
 
     if (cart.length === 0) {
-        container.innerHTML = "<p style='color:red;'>Кошик порожній!</p>";
+        list.innerHTML = "<p style='color:red;'>Кошик порожній! Поверніться і додайте товар.</p>";
     } else {
+        let total = 0;
+        list.innerHTML = "";
         cart.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'item';
-            el.innerHTML = `<span>${item.name}</span><span>${item.price} грн</span>`;
-            container.appendChild(el);
-            sum += item.price;
+            const row = document.createElement('div');
+            row.className = 'item';
+            row.innerHTML = `<span>${item.name}</span><span>${item.price} грн</span>`;
+            list.appendChild(row);
+            total += item.price;
         });
+        totalField.innerText = total;
     }
-    totalDisp.innerText = sum;
 
-    document.getElementById('order-form').addEventListener('submit', async (e) => {
+    document.getElementById('final-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (cart.length === 0) return alert("Додайте товари!");
+        if (cart.length === 0) return alert("Кошик порожній!");
 
         const order = {
-            name: document.getElementById('name').value,
-            phone: document.getElementById('phone').value,
-            address: document.getElementById('address').value,
+            name: document.getElementById('u-name').value,
+            phone: document.getElementById('u-phone').value,
+            address: document.getElementById('u-addr').value,
             items: cart,
-            total: sum
+            total: Number(totalField.innerText)
         };
 
-        try {
-            const res = await fetch('/api/order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(order)
-            });
+        const res = await fetch('/api/order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(order)
+        });
 
-            if (res.ok) {
-                alert("Замовлення надіслано!");
-                sessionStorage.removeItem('cart'); // Очищаємо після замовлення
-                window.location.href = "/";
-            }
-        } catch (err) {
-            alert("Помилка зв'язку з сервером");
+        if (res.ok) {
+            alert("Замовлення прийнято!");
+            sessionStorage.removeItem('cart');
+            window.location.href = "/";
         }
     });
 });
