@@ -1,6 +1,12 @@
-window.addToCart = function(name, price) {
+function addToCart(name, price) {
+    // Отримуємо список або створюємо порожній масив
     let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+    
+    // Додаємо об'єкт товару
     cart.push({ name: name, price: Number(price) });
+    
+    // Зберігаємо
     sessionStorage.setItem('cart', JSON.stringify(cart));
-    alert(name + " додано у кошик!");
-};
+    
+    alert("Додано: " + name);
+}
