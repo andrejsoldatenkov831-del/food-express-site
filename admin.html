@@ -20,7 +20,6 @@
             color: var(--dark);
         }
 
-        /* Навігація */
         .admin-nav {
             background: var(--dark);
             color: white;
@@ -51,7 +50,6 @@
         .stat-card h3 { margin: 0; font-size: 14px; color: #888; text-transform: uppercase; }
         .stat-card p { margin: 10px 0 0; font-size: 24px; font-weight: 800; color: var(--accent); }
 
-        /* Список замовлень */
         .container { max-width: 1200px; margin: 0 auto; padding: 0 30px 50px; }
         
         .order-grid {
@@ -177,7 +175,6 @@
             const res = await fetch('/api/admin/orders');
             const orders = await res.json();
             
-            // Оновлення статистики
             document.getElementById('total-count').innerText = orders.length;
             const revenue = orders.reduce((sum, o) => sum + o.total_price, 0);
             document.getElementById('total-revenue').innerText = revenue + ' грн';
@@ -221,7 +218,6 @@
         fetchOrders();
     }
 
-    // Авто-оновлення кожні 20 секунд
     fetchOrders();
     setInterval(fetchOrders, 20000);
 </script>

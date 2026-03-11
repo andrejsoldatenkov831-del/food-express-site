@@ -4,17 +4,14 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Налаштування обробки даних
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Ініціалізація бази даних
 const db = new sqlite3.Database('./orders.db', (err) => {
     if (err) console.error('Помилка БД:', err.message);
     else console.log('✅ База даних готова до роботи');
 });
 
-// Створення таблиці (якщо її немає)
 db.serialize(() => {
     db.run(`CREATE TABLE IF NOT EXISTS orders (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -27,7 +24,6 @@ db.serialize(() => {
     )`);
 });
 
-// --- МАРШРУТИ ДЛЯ СТОРІНОК ---
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
@@ -41,9 +37,7 @@ app.get('/admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'admin.html'));
 });
 
-// --- API МАРШРУТИ ---
 
-// 1. Отримання замовлень (для адмінки)
 app.get('/api/admin/orders', (req, res) => {
     db.all(`SELECT * FROM orders ORDER BY id DESC`, [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -51,11 +45,9 @@ app.get('/api/admin/orders', (req, res) => {
     });
 });
 
-// 2. Створення замовлення (виправлено помилку 500)
 app.post('/api/order', (req, res) => {
     const { name, phone, address, items, total } = req.body;
     
-    // Перевірка наявності даних
     if (!name || !phone || !items) {
         return res.status(400).json({ success: false, error: "Missing data" });
     }
@@ -73,7 +65,6 @@ app.post('/api/order', (req, res) => {
     });
 });
 
-// 3. Видалення замовлення
 app.delete('/api/admin/orders/:id', (req, res) => {
     db.run(`DELETE FROM orders WHERE id = ?`, req.params.id, function(err) {
         if (err) return res.status(500).json({ error: err.message });
