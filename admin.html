@@ -1,19 +1,229 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
-    <title>Панель</title>
     <meta charset="UTF-8">
-</head>
-<body style="background: #f4f4f4; padding: 20px;">
-    <h1>Адмін-панель</h1>
-    <div id="orders-list">Завантаження замовлень...</div>
-    <script>
-        async function load() {
-            const res = await fetch('/api/admin/orders');
-            const data = await res.json();
-            document.getElementById('orders-list').innerHTML = JSON.stringify(data);
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель керування | FoodExpress</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0f2f5;
+            --accent: #ff5c5c;
+            --dark: #1e272e;
+            --white: #ffffff;
         }
-        load();
-    </script>
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            color: var(--dark);
+        }
+
+        /* Навігація */
+        .admin-nav {
+            background: var(--dark);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            text-align: center;
+        }
+
+        .stat-card h3 { margin: 0; font-size: 14px; color: #888; text-transform: uppercase; }
+        .stat-card p { margin: 10px 0 0; font-size: 24px; font-weight: 800; color: var(--accent); }
+
+        /* Список замовлень */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 30px 50px; }
+        
+        .order-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .order-card {
+            background: var(--white);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #eee;
+        }
+
+        .order-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+
+        .order-card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 5px; height: 100%;
+            background: var(--accent);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .order-id { font-weight: 800; font-size: 18px; color: var(--accent); }
+        .order-time { font-size: 13px; color: #999; }
+
+        .client-detail { margin-bottom: 8px; font-size: 15px; }
+        .client-detail strong { color: #555; width: 80px; display: inline-block; }
+
+        .items-box {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 15px 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .item-tag {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .order-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .price-tag { font-size: 20px; font-weight: 800; color: var(--dark); }
+
+        .btn-delete {
+            background: #fff0f0;
+            color: var(--accent);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-delete:hover { background: var(--accent); color: white; }
+
+        .refresh-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,92,92,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-nav">
+    <h2>FoodExpress Admin</h2>
+    <button class="refresh-btn" onclick="fetchOrders()">Оновити дані</button>
+</div>
+
+<div class="stats-bar">
+    <div class="stat-card">
+        <h3>Усього замовлень</h3>
+        <p id="total-count">0</p>
+    </div>
+    <div class="stat-card">
+        <h3>Виторг</h3>
+        <p id="total-revenue">0 грн</p>
+    </div>
+</div>
+
+<div class="container">
+    <div id="orders-display" class="order-grid">
+        </div>
+</div>
+
+<script>
+    async function fetchOrders() {
+        const grid = document.getElementById('orders-display');
+        try {
+            const res = await fetch('/api/admin/orders');
+            const orders = await res.json();
+            
+            // Оновлення статистики
+            document.getElementById('total-count').innerText = orders.length;
+            const revenue = orders.reduce((sum, o) => sum + o.total_price, 0);
+            document.getElementById('total-revenue').innerText = revenue + ' грн';
+
+            if (orders.length === 0) {
+                grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; padding: 50px; color: #888;">Замовлень поки немає...</p>';
+                return;
+            }
+
+            grid.innerHTML = orders.map(order => {
+                const items = JSON.parse(order.items);
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <span class="order-id">#${order.id}</span>
+                            <span class="order-time">${order.date}</span>
+                        </div>
+                        <div class="client-detail"><strong>Клієнт:</strong> ${order.customer_name}</div>
+                        <div class="client-detail"><strong>Тел:</strong> ${order.phone}</div>
+                        <div class="client-detail"><strong>Адреса:</strong> ${order.address}</div>
+                        
+                        <div class="items-box">
+                            ${items.map(i => `<span class="item-tag">${i.name}</span>`).join('')}
+                        </div>
+                        
+                        <div class="order-footer">
+                            <button class="btn-delete" onclick="removeOrder(${order.id})">Видалити</button>
+                            <span class="price-tag">${order.total_price} грн</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function removeOrder(id) {
+        if (!confirm('Видалити замовлення?')) return;
+        await fetch(`/api/admin/orders/${id}`, { method: 'DELETE' });
+        fetchOrders();
+    }
+
+    // Авто-оновлення кожні 20 секунд
+    fetchOrders();
+    setInterval(fetchOrders, 20000);
+</script>
 </body>
 </html>
