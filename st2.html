@@ -53,29 +53,78 @@
 </div>
 
 <div class="main-layout">
-    <div class="menu-section">
-        <h1>страви</h1>
-        
+<div class="menu-section">
+    <h1>страви</h1>
+    
+    <h2 style="margin: 40px 0 20px; font-weight: 800; color: #555;">🍕 Піца</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1627626775846-122b778965ae?w=600" alt="Піца">
+            <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?w=600" alt="Пепероні">
             <div class="card-body">
                 <h3>Піца "Пепероні"</h3>
-                <p style="color: #777">Гостра ковбаса, моцарела, фірмовий соус</p>
+                <p style="color: #777">Гостра ковбаса, моцарела, фірмовий соус, орегано.</p>
                 <div class="card-price">220 грн</div>
                 <button class="btn-add" onclick="addToCart('Піца Пепероні', 220)">Додати у кошик</button>
             </div>
         </div>
 
         <div class="card">
-            <img src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600" alt="Бургер">
+            <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600" alt="Маргарита">
             <div class="card-body">
-                <h3>Дабл Чізбургер</h3>
-                <p style="color: #777">Дві котлети з яловичини, багато сиру, овочі</p>
-                <div class="card-price">180 грн</div>
-                <button class="btn-add" onclick="addToCart('Дабл Чізбургер', 180)">Додати у кошик</button>
+                <h3>Піца "Маргарита"</h3>
+                <p style="color: #777">Томати конкасе, подвійна моцарела, свіжий базилік.</p>
+                <div class="card-price">190 грн</div>
+                <button class="btn-add" onclick="addToCart('Піца Маргарита', 190)">Додати у кошик</button>
             </div>
         </div>
     </div>
+
+    <h2 style="margin: 40px 0 20px; font-weight: 800; color: #555;">🍔 Бургери</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600" alt="Бургер">
+            <div class="card-body">
+                <h3>Дабл Чізбургер</h3>
+                <p style="color: #777">Дві соковиті котлети, чеддер, маринована цибуля.</p>
+                <div class="card-price">185 грн</div>
+                <button class="btn-add" onclick="addToCart('Дабл Чізбургер', 185)">Додати у кошик</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=600" alt="Бургер BBQ">
+            <div class="card-body">
+                <h3>BBQ Бургер</h3>
+                <p style="color: #777">Бекон, карамелізована цибуля, соус Барбекю.</p>
+                <div class="card-price">210 грн</div>
+                <button class="btn-add" onclick="addToCart('BBQ Бургер', 210)">Додати у кошик</button>
+            </div>
+        </div>
+    </div>
+
+    <h2 style="margin: 40px 0 20px; font-weight: 800; color: #555;">🥗 Салати та Напої</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600" alt="Цезар">
+            <div class="card-body">
+                <h3>Салат "Цезар"</h3>
+                <p style="color: #777">Курка гриль, пармезан, крутони та соус анчоус.</p>
+                <div class="card-price">165 грн</div>
+                <button class="btn-add" onclick="addToCart('Салат Цезар', 165)">Додати у кошик</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="https://images.unsplash.com/photo-1624517452488-04869289c4ca?w=600" alt="Лимонад">
+            <div class="card-body">
+                <h3>Домашній Лимонад</h3>
+                <p style="color: #777">Натуральний сік лимона, м'ята, лід та газована вода.</p>
+                <div class="card-price">65 грн</div>
+                <button class="btn-add" onclick="addToCart('Лимонад', 65)">Додати у кошик</button>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="cart-widget">
         <h3>🛒 Ваш кошик</h3>
